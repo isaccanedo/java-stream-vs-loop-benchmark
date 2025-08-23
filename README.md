@@ -43,6 +43,22 @@ public class StreamVsLoopTest {
                 Duration.between(start, end).toMillis() + " ms");
     }
 }
-
-
 ```
+
+### O que esse código faz?
+
+1 - Gera 10 milhões de números aleatórios.
+
+2 - Calcula o quadrado de cada número:
+
+- Usando for tradicional.
+- Usando stream().
+- Usando parallelStream().
+
+Mede o tempo gasto em cada abordagem.
+
+👉 Resultados esperados (podem variar dependendo do hardware):
+
+O loop tradicional costuma ser o mais rápido em operações muito simples (menos overhead).
+O stream sequencial pode ser um pouco mais lento, devido à abstração.
+O parallelStream() geralmente vence em grandes volumes, porque distribui o trabalho entre múltiplos núcleos.
