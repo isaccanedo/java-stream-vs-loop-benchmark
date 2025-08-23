@@ -62,3 +62,56 @@ Mede o tempo gasto em cada abordagem.
 O loop tradicional costuma ser o mais rápido em operações muito simples (menos overhead).
 O stream sequencial pode ser um pouco mais lento, devido à abstração.
 O parallelStream() geralmente vence em grandes volumes, porque distribui o trabalho entre múltiplos núcleos.
+
+### Vamos aumentar a complexidade da operação, para que o paralelismo do parallelStream() realmente faça diferença.
+
+```
+import java.util.*;
+import java.util.stream.*;
+import java.time.*;
+
+public class StreamVsLoopHeavyTest {
+    public static void main(String[] args) {
+        int numElements = 10_000_000;
+        List<Double> data = new Random()
+                .doubles(numElements, 1, 100)
+                .boxed()
+                .collect(Collectors.toList());
+
+        // --- Loop tradicional com operação pesada ---
+        Instant start = Instant.now();
+        List<Double> resultLoop = new ArrayList<>(data.size());
+        for (Double n : data) {
+            resultLoop.add(Math.pow(n, 10)); // operação pesada
+        }
+        Instant end = Instant.now();
+        System.out.println("Loop tradicional: " +
+                Duration.between(start, end).toMillis() + " ms");
+
+        // --- Stream sequencial ---
+        start = Instant.now();
+        List<Double> resultStream = data.stream()
+                .map(n -> Math.pow(n, 10))
+                .collect(Collectors.toList());
+        end = Instant.now();
+        System.out.println("Stream sequencial: " +
+                Duration.between(start, end).toMillis() + " ms");
+
+        // --- Parallel Stream ---
+        start = Instant.now();
+        List<Double> resultParallel = data.parallelStream()
+                .map(n -> Math.pow(n, 10))
+                .collect(Collectors.toList());
+        end = Instant.now();
+        System.out.println("Parallel Stream: " +
+                Duration.between(start, end).toMillis() + " ms");
+    }
+}
+```
+
+## Mudanças principais:
+
+- Troquei Integer por Double para permitir potências grandes.
+- A operação agora é Math.pow(n, 10), bem mais custosa que multiplicar por si mesmo.
+- Mantive o volume grande de dados (10 milhões), assim o paralelismo terá efeito visível.
+
